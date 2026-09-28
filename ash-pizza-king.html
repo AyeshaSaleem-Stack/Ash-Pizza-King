@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ash Pizza King — Wood-Fired Pizzeria</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --char:#14100d;
+    --char-2:#1c1611;
+    --ember:#b8232b;
+    --ember-light:#e0393f;
+    --flame:#e8722c;
+    --flame-light:#f4a24f;
+    --parchment:#f1e6d3;
+    --parchment-dim:#c9bda7;
+    --brick:#6b4530;
+    --gold:#c9a24b;
+    --line: rgba(241,230,211,0.14);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--char);
+    color:var(--parchment);
+    font-family:'Sora',sans-serif;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
+  }
+
+  h1,h2,h3,h4{font-family:'Fraunces',serif; font-weight:600; letter-spacing:-0.01em;}
+  a{color:inherit; text-decoration:none;}
+  img{display:block; max-width:100%;}
+  ::selection{background:var(--ember); color:var(--parchment);}
+  :focus-visible{outline:2px solid var(--flame-light); outline-offset:3px;}
+
+  /* texture overlay */
+  .grain{
+    position:fixed; inset:0; pointer-events:none; z-index:500; opacity:0.05; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:fixed; top:0; left:0; right:0; z-index:200;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px 5vw;
+    transition:background .4s ease, padding .4s ease, border-color .4s ease;
+    border-bottom:1px solid transparent;
+  }
+  nav.scrolled{
+    background:rgba(20,16,13,0.86);
+    backdrop-filter:blur(10px);
+    padding:14px 5vw;
+    border-bottom:1px solid var(--line);
+  }
+  .logo{
+    font-family:'Fraunces',serif; font-weight:700; font-size:1.15rem; letter-spacing:0.01em;
+    display:flex; align-items:center; gap:10px; white-space:nowrap;
+  }
+  .logo .dot{width:8px; height:8px; border-radius:50%; background:var(--flame); box-shadow:0 0 12px 3px var(--flame);}
+  .nav-links{display:flex; gap:2.4rem; font-size:0.86rem; letter-spacing:0.06em; text-transform:uppercase;}
+  .nav-links a{position:relative; padding-bottom:4px; opacity:0.85; transition:opacity .25s;}
+  .nav-links a:hover{opacity:1;}
+  .nav-links a::after{content:'';position:absolute; left:0; bottom:0; width:0; height:1px; background:var(--flame); transition:width .3s ease;}
+  .nav-links a:hover::after{width:100%;}
+  .nav-cta{
+    font-family:'JetBrains Mono',monospace; font-size:0.78rem; letter-spacing:0.04em;
+    border:1px solid var(--ember); color:var(--parchment); padding:10px 20px; border-radius:2px;
+    transition:background .3s, border-color .3s;
+  }
+  .nav-cta:hover{background:var(--ember);}
+  @media (max-width:860px){ .nav-links{display:none;} }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative; min-height:100svh; display:grid; grid-template-columns:1.05fr 0.95fr;
+    align-items:stretch; padding-top:0; overflow:hidden;
+    background:
+      radial-gradient(ellipse 70% 60% at 15% 30%, rgba(184,35,43,0.16), transparent 60%),
+      linear-gradient(180deg,#100c0a 0%, #14100d 60%, #0f0b09 100%);
+  }
+  .hero::before{
+    content:'';
+    position:absolute; inset:0;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(241,230,211,0.035) 0 2px, transparent 2px 42px),
+      repeating-linear-gradient(90deg, rgba(241,230,211,0.03) 0 2px, transparent 2px 84px);
+    opacity:0.5; pointer-events:none;
+  }
+  .hero-copy{
+    position:relative; z-index:5; display:flex; flex-direction:column; justify-content:center;
+    padding:0 5vw; padding-top:90px;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace; font-size:0.8rem; letter-spacing:0.18em; text-transform:uppercase;
+    color:var(--flame-light); margin-bottom:1.6rem; display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{content:''; width:26px; height:1px; background:var(--flame-light);}
+  .hero h1{
+    font-size:clamp(3rem, 6.6vw, 5.6rem); line-height:0.98; color:var(--parchment);
+    max-width:11ch;
+  }
+  .hero h1 em{
+    font-style:italic; font-weight:500; color:var(--flame-light);
+    text-shadow:0 0 30px rgba(232,114,44,0.35);
+  }
+  .hero p.lede{
+    margin-top:1.8rem; max-width:38ch; font-size:1.08rem; line-height:1.7; color:var(--parchment-dim); font-weight:300;
+  }
+  .hero-actions{display:flex; gap:1rem; margin-top:2.6rem; flex-wrap:wrap;}
+  .btn-primary{
+    background:var(--ember); color:var(--parchment); padding:16px 30px; border-radius:2px;
+    font-size:0.9rem; letter-spacing:0.03em; font-weight:500;
+    display:inline-flex; align-items:center; gap:10px;
+    transition:transform .25s ease, box-shadow .25s ease, background .25s;
+    box-shadow:0 8px 30px -8px rgba(184,35,43,0.6);
+  }
+  .btn-primary:hover{transform:translateY(-2px); background:var(--ember-light); box-shadow:0 14px 34px -8px rgba(184,35,43,0.75);}
+  .btn-ghost{
+    border:1px solid var(--line); color:var(--parchment); padding:16px 28px; border-radius:2px;
+    font-size:0.9rem; letter-spacing:0.03em; transition:border-color .25s, background .25s;
+  }
+  .btn-ghost:hover{border-color:var(--flame-light); background:rgba(241,230,211,0.04);}
+
+  .hero-stats{display:flex; gap:2.6rem; margin-top:3.4rem; padding-top:2rem; border-top:1px solid var(--line);}
+  .stat b{font-family:'Fraunces',serif; font-size:1.7rem; color:var(--flame-light); display:block; font-weight:600;}
+  .stat span{font-size:0.76rem; color:var(--parchment-dim); letter-spacing:0.05em; text-transform:uppercase;}
+
+  .hero-visual{
+    position:relative; overflow:hidden;
+  }
+  .hero-visual img{
+    width:100%; height:100%; object-fit:cover; object-position:center 18%;
+    filter:saturate(1.05) contrast(1.05);
+  }
+  .hero-visual .glow-bottom{
+    position:absolute; left:0; right:0; bottom:0; height:55%;
+    background:linear-gradient(180deg, transparent, rgba(20,16,13,0.96));
+  }
+  .hero-visual .glow-side{
+    position:absolute; top:0; bottom:0; left:0; width:18%;
+    background:linear-gradient(90deg, rgba(20,16,13,0.9), transparent);
+  }
+  .hero-visual .flame-tint{
+    position:absolute; inset:0; mix-blend-mode:multiply;
+    background:linear-gradient(200deg, rgba(232,114,44,0.18), transparent 45%);
+    animation:tintPulse 6s ease-in-out infinite;
+  }
+  @keyframes tintPulse{ 0%,100%{opacity:0.7;} 50%{opacity:1;} }
+
+  .badge-float{
+    position:absolute; bottom:38px; right:34px; z-index:6;
+    background:rgba(20,16,13,0.72); backdrop-filter:blur(8px);
+    border:1px solid var(--line); border-radius:3px; padding:16px 20px;
+    display:flex; align-items:center; gap:12px;
+  }
+  .badge-float .flame-ico{width:20px; height:20px; flex:none;}
+  .badge-float span{font-family:'JetBrains Mono',monospace; font-size:0.74rem; letter-spacing:0.03em; color:var(--parchment-dim); line-height:1.4;}
+  .badge-float b{color:var(--flame-light); font-family:'Fraunces',serif; font-weight:600; font-size:0.9rem; display:block;}
+
+  #embers{position:absolute; inset:0; z-index:2; pointer-events:none;}
+
+  @media (max-width:900px){
+    .hero{grid-template-columns:1fr; grid-template-rows:auto 62vh;}
+    .hero-copy{padding-top:120px; padding-bottom:3rem;}
+    .hero-stats{flex-wrap:wrap; row-gap:1.4rem;}
+    .badge-float{right:16px; bottom:16px; padding:12px 14px;}
+  }
+
+  .scroll-cue{
+    position:absolute; bottom:26px; left:5vw; z-index:6; display:flex; align-items:center; gap:10px;
+    font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--parchment-dim);
+  }
+  .scroll-cue .line{width:1px; height:34px; background:linear-gradient(180deg,var(--flame-light),transparent); position:relative; overflow:hidden;}
+  .scroll-cue .line::after{content:'';position:absolute; left:0; top:-100%; width:100%; height:100%; background:var(--parchment); animation:cueDrop 2.2s ease-in-out infinite;}
+  @keyframes cueDrop{ 0%{top:-100%;} 60%{top:100%;} 100%{top:100%;} }
+  @media (max-width:900px){ .scroll-cue{display:none;} }
+
+  /* ---------- SECTION SHARED ---------- */
+  section{position:relative; padding:9rem 5vw;}
+  .section-head{max-width:640px; margin-bottom:4.5rem;}
+  .section-head .eyebrow{margin-bottom:1.2rem;}
+  .section-head h2{font-size:clamp(2.2rem,4vw,3.2rem); color:var(--parchment); line-height:1.08;}
+  .section-head p{margin-top:1.2rem; color:var(--parchment-dim); font-size:1.02rem; line-height:1.7; max-width:52ch; font-weight:300;}
+
+  .reveal{opacity:0; transform:translateY(28px); transition:opacity .8s ease, transform .8s ease;}
+  .reveal.in{opacity:1; transform:translateY(0);}
+
+  /* ---------- STORY / FIRE ---------- */
+  .story{background:var(--char-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+  .story-grid{display:grid; grid-template-columns:0.9fr 1.1fr; gap:5vw; align-items:center;}
+  .story-copy p{color:var(--parchment-dim); line-height:1.85; font-size:1.02rem; font-weight:300; margin-bottom:1.3rem;}
+  .story-copy p b{color:var(--parchment); font-weight:500;}
+
+  .oven-wrap{position:relative; aspect-ratio:1/1; max-width:480px; margin:0 auto;}
+  .oven-ring{
+    position:absolute; inset:0; border-radius:50%;
+    background:radial-gradient(circle at 50% 55%, #ff9d4d 0%, #e8722c 18%, #b8232b 38%, #4a1a12 62%, #1c1210 78%, transparent 82%);
+    filter:blur(0px);
+    animation:emberBreathe 4.2s ease-in-out infinite;
+  }
+  @keyframes emberBreathe{ 0%,100%{transform:scale(1); filter:brightness(1);} 50%{transform:scale(1.035); filter:brightness(1.12);} }
+  .oven-core{
+    position:absolute; inset:14%; border-radius:50%; border:1px solid rgba(241,230,211,0.18);
+    display:flex; align-items:center; justify-content:center; text-align:center;
+  }
+  .oven-core-inner{font-family:'Fraunces',serif;}
+  .oven-core-inner b{font-size:3.2rem; font-weight:700; color:var(--parchment); display:block; text-shadow:0 0 40px rgba(232,114,44,0.7);}
+  .oven-core-inner span{font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--parchment-dim);}
+  .oven-sparks{position:absolute; inset:0; overflow:visible;}
+
+  .process{display:flex; gap:2.4rem; margin-top:3.4rem; flex-wrap:wrap;}
+  .process-step{flex:1; min-width:150px; border-top:1px solid var(--line); padding-top:1.2rem;}
+  .process-step .num{font-family:'JetBrains Mono',monospace; color:var(--flame-light); font-size:0.8rem;}
+  .process-step h4{margin-top:0.6rem; font-size:1.05rem; color:var(--parchment); font-weight:600;}
+  .process-step p{margin-top:0.4rem; font-size:0.86rem; color:var(--parchment-dim); line-height:1.55;}
+
+  /* ---------- MENU ---------- */
+  .menu-head-row{display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:2rem;}
+  .menu-tabs{display:flex; gap:0.5rem; font-family:'JetBrains Mono',monospace; font-size:0.78rem;}
+  .menu-tabs span{padding:8px 16px; border:1px solid var(--line); border-radius:20px; color:var(--parchment-dim); cursor:pointer; transition:border-color .25s, color .25s, background .25s; user-select:none;}
+  .menu-tabs span:hover{color:var(--parchment);}
+  .menu-tabs span.active{border-color:var(--flame); color:var(--flame-light);}
+
+  .menu-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); margin-top:3.5rem; border:1px solid var(--line);}
+  .menu-item{
+    background:var(--char); position:relative; overflow:hidden; display:flex; flex-direction:column;
+    transition:background .35s ease;
+  }
+  .menu-item.hidden{display:none;}
+  .menu-item::before{
+    content:''; position:absolute; left:0; top:0; right:0; height:3px; background:var(--ember);
+    transform:scaleX(0); transform-origin:left; transition:transform .4s ease; z-index:2;
+  }
+  .menu-item:hover{background:var(--char-2);}
+  .menu-item:hover::before{transform:scaleX(1);}
+  .menu-item-visual{
+    aspect-ratio:1/1; position:relative; border-bottom:1px solid var(--line);
+    background:radial-gradient(circle at 50% 30%, #2e221a 0%, #17120e 68%, #0e0b09 100%);
+    display:flex; align-items:center; justify-content:center; overflow:hidden;
+  }
+  .menu-item-visual img{width:100%; height:100%; object-fit:cover; transition:transform .5s ease; filter:saturate(1.08) contrast(1.05);}
+  .menu-item:hover .menu-item-visual img{transform:scale(1.06);}
+  .menu-item-visual svg{width:82%; height:82%; transition:transform .5s ease;}
+  .menu-item:hover .menu-item-visual svg{transform:scale(1.045);}
+  .menu-item-body{padding:2rem 2.2rem 2.4rem;}
+  .menu-item-top{display:flex; justify-content:space-between; align-items:baseline; gap:1rem;}
+  .menu-item h3{font-size:1.25rem; color:var(--parchment); font-weight:600;}
+  .menu-item .price{font-family:'JetBrains Mono',monospace; color:var(--flame-light); font-size:1.05rem; white-space:nowrap;}
+  .menu-item p{margin-top:0.8rem; color:var(--parchment-dim); font-size:0.88rem; line-height:1.6; font-weight:300;}
+  .menu-item .tag{
+    display:inline-block; margin-top:1.1rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem;
+    letter-spacing:0.08em; text-transform:uppercase; color:var(--gold); border:1px solid rgba(201,162,75,0.35);
+    padding:4px 10px; border-radius:20px;
+  }
+  @media (max-width:900px){ .menu-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:560px){ .menu-grid{grid-template-columns:1fr;} }
+
+  /* ---------- CHEF QUOTE ---------- */
+  .quote-band{
+    background:linear-gradient(180deg, var(--char) 0%, #0d0a08 100%);
+    border-top:1px solid var(--line);
+    display:grid; grid-template-columns:0.4fr 0.6fr;
+  }
+  .quote-mark{font-family:'Fraunces',serif; font-size:8rem; color:var(--ember); line-height:0.7; opacity:0.85;}
+  .quote-band-copy{display:flex; flex-direction:column; justify-content:center; padding:6rem 6vw 6rem 0;}
+  .quote-band blockquote{
+    font-family:'Fraunces',serif; font-style:italic; font-weight:500; font-size:clamp(1.5rem,2.4vw,2.1rem);
+    color:var(--parchment); line-height:1.5; max-width:22ch;
+  }
+  .quote-attr{margin-top:2rem; display:flex; align-items:center; gap:14px;}
+  .quote-attr .line-sm{width:34px; height:1px; background:var(--flame-light);}
+  .quote-attr b{font-family:'Sora',sans-serif; font-weight:600; color:var(--parchment); display:block; font-size:0.95rem;}
+  .quote-attr span{color:var(--parchment-dim); font-size:0.8rem; font-family:'JetBrains Mono',monospace;}
+  @media (max-width:760px){ .quote-band{grid-template-columns:1fr; padding:5rem 5vw;} .quote-mark{display:none;} .quote-band-copy{padding:0;} }
+
+  /* ---------- GALLERY / INGREDIENTS ---------- */
+  .ingredients{background:var(--char-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+  .ing-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:1.4rem; margin-top:3.5rem;}
+  .ing-card{
+    border:1px solid var(--line); padding:2.2rem 1.6rem; text-align:left; border-radius:2px;
+    transition:transform .35s ease, border-color .35s ease;
+  }
+  .ing-card:hover{transform:translateY(-6px); border-color:var(--flame);}
+  .ing-card .ico{width:40px; height:40px; margin-bottom:1.4rem;}
+  .ing-card h4{font-size:1.05rem; color:var(--parchment); font-weight:600;}
+  .ing-card p{margin-top:0.5rem; font-size:0.84rem; color:var(--parchment-dim); line-height:1.55;}
+  @media (max-width:900px){ .ing-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:520px){ .ing-grid{grid-template-columns:1fr;} }
+
+  /* ---------- VISIT ---------- */
+  .visit{display:grid; grid-template-columns:1fr 1fr; gap:5vw;}
+  .visit-card{border:1px solid var(--line); padding:2.4rem; border-radius:2px;}
+  .visit-card h4{font-family:'JetBrains Mono',monospace; font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--flame-light); margin-bottom:1.2rem;}
+  .visit-row{display:flex; justify-content:space-between; padding:0.8rem 0; border-top:1px solid var(--line); font-size:0.92rem;}
+  .visit-row:first-of-type{border-top:none;}
+  .visit-row span:first-child{color:var(--parchment-dim);}
+  .visit-address{margin-top:2.2rem;}
+  .visit-address p{color:var(--parchment-dim); line-height:1.7; font-size:0.95rem;}
+  @media (max-width:800px){ .visit{grid-template-columns:1fr; gap:2rem;} }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    border-top:1px solid var(--line); padding:4rem 5vw 2.4rem; display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:2rem;
+  }
+  footer .foot-cols{display:flex; gap:5vw; flex-wrap:wrap;}
+  footer h5{font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--parchment-dim); margin-bottom:1rem;}
+  footer ul{list-style:none;}
+  footer li{margin-bottom:0.6rem; font-size:0.9rem;}
+  footer li a{opacity:0.85; transition:opacity .2s;}
+  footer li a:hover{opacity:1; color:var(--flame-light);}
+  .foot-bottom{width:100%; border-top:1px solid var(--line); margin-top:3rem; padding-top:1.6rem; display:flex; justify-content:space-between; font-size:0.76rem; color:var(--parchment-dim); font-family:'JetBrains Mono',monospace;}
+  @media (max-width:600px){ .foot-bottom{flex-direction:column; gap:0.6rem;} }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<nav id="nav">
+  <div class="logo"><span class="dot"></span>ASH PIZZA KING</div>
+  <div class="nav-links">
+    <a href="#story">Our Fire</a>
+    <a href="#menu">Menu</a>
+    <a href="#ingredients">Ingredients</a>
+    <a href="#visit">Visit</a>
+  </div>
+  <a href="#visit" class="nav-cta">Reserve a Table</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-copy">
+    <div class="eyebrow">Wood-Fired · Since 2014</div>
+    <h1>Pizza, made<br>with <em>love</em> and<br>live fire.</h1>
+    <p class="lede">Every pie at Ash Pizza King passes through a 900°F oak-fired oven in ninety seconds flat — a blistered crust, a smoky char, and a chef who's spent a decade chasing the perfect flame.</p>
+    <div class="hero-actions">
+      <a href="#menu" class="btn-primary">View the Menu →</a>
+      <a href="#visit" class="btn-ghost">Book a Table</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><b>900°F</b><span>Oven Heat</span></div>
+      <div class="stat"><b>90 sec</b><span>Bake Time</span></div>
+      <div class="stat"><b>4.9★</b><span>1,200+ Reviews</span></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <img src="https://images.unsplash.com/photo-1590947132387-155cc02f3212?auto=format&fit=crop&w=1200&q=80" alt="Chef in black uniform with red piping, standing before a lit wood-fired pizza oven">
+    <div class="flame-tint"></div>
+    <div class="glow-side"></div>
+    <div class="glow-bottom"></div>
+    <div id="embers"></div>
+    <div class="badge-float">
+      <svg class="flame-ico" viewBox="0 0 24 24" fill="none"><path d="M12 2c1 4-3 5-3 9a3 3 0 006 0c0-1.5-1-2-1-3.5 1.5 1 3 3 3 5.5a5 5 0 01-10 0c0-4 2-6 5-11z" fill="#e8722c"/></svg>
+      <span><b>Marco De Luca</b>Head Pizzaiolo</span>
+    </div>
+  </div>
+  <div class="scroll-cue"><div class="line"></div>SCROLL</div>
+</section>
+
+<section class="story" id="story">
+  <div class="story-grid">
+    <div class="story-copy reveal">
+      <div class="eyebrow">The Fire</div>
+      <h2 style="font-size:clamp(2.2rem,4vw,3rem); margin-bottom:1.6rem; color:var(--parchment);">One oven.<br>One temperature.<br>No shortcuts.</h2>
+      <p>Our oven is fed <b>oak and cherry wood</b>, hand-split every morning and burned down to embers before the first dough hits the peel. The heat never drops below 850°F — hot enough to blister the crust before the toppings even think about overcooking.</p>
+      <p>It's the same method Marco learned in a stone-floored kitchen outside Naples: <b>flour, water, salt, time</b> — and a fire that does the rest.</p>
+      <div class="process">
+        <div class="process-step">
+          <div class="num">01</div>
+          <h4>Knead</h4>
+          <p>00-flour dough, hand-mixed in small batches.</p>
+        </div>
+        <div class="process-step">
+          <div class="num">02</div>
+          <h4>Rest</h4>
+          <p>72-hour cold ferment for depth and lightness.</p>
+        </div>
+        <div class="process-step">
+          <div class="num">03</div>
+          <h4>Fire</h4>
+          <p>90 seconds at 900°F, turned by hand.</p>
+        </div>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="oven-wrap">
+        <div class="oven-ring"></div>
+        <svg class="oven-sparks" viewBox="0 0 480 480"></svg>
+        <div class="oven-core">
+          <div class="oven-core-inner">
+            <b>900°</b>
+            <span>Fahrenheit, Always</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="menu">
+  <div class="section-head reveal">
+    <div class="eyebrow">The Menu</div>
+    <div class="menu-head-row">
+      <div>
+        <h2>Six pies. Zero compromises.</h2>
+        <p>A tight menu, built around what the oven does best. Every pizza is fired to order — nothing sits, nothing waits.</p>
+      </div>
+      <div class="menu-tabs">
+        <span class="active" data-tab="signature" onclick="switchMenuTab('signature', this)">Signature</span>
+        <span data-tab="classic" onclick="switchMenuTab('classic', this)">Classic</span>
+        <span data-tab="seasonal" onclick="switchMenuTab('seasonal', this)">Seasonal</span>
+      </div>
+    </div>
+  </div>
+  <div class="menu-grid reveal" id="menuGrid">
+
+    <div class="menu-item" data-cat="signature">
+      <div class="menu-item-visual">
+        <img src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=800&q=80" alt="Margherita Brace pizza" loading="lazy">
+      </div>
+      <div class="menu-item-body">
+        <div class="menu-item-top"><h3>Margherita Brace</h3><span class="price">$18</span></div>
+        <p>San Marzano tomato, fior di latte, torn basil, a finish of Sicilian olive oil. The one that tells you everything about the oven.</p>
+        <span class="tag">Chef's Pick</span>
+      </div>
+    </div>
+
+    <div class="menu-item" data-cat="signature">
+      <div class="menu-item-visual">
+        <img src="https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=800&q=80" alt="Nduja & Honey pizza" loading="lazy">
+      </div>
+      <div class="menu-item-body">
+        <div class="menu-item-top"><h3>Nduja & Honey</h3><span class="price">$22</span></div>
+        <p>Calabrian spreadable salami, stracciatella, whipped ricotta, wildflower honey drizzle, chili flake.</p>
+        <span class="tag">Spicy</span>
+      </div>
+    </div>
+
+    <div class="menu-item" data-cat="signature">
+      <div class="menu-item-visual">
+        <img src="https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?auto=format&fit=crop&w=800&q=80" alt="Funghi e Tartufo pizza" loading="lazy">
+      </div>
+      <div class="menu-item-body">
+        <div class="menu-item-top"><h3>Funghi e Tartufo</h3><span class="price">$24</span></div>
+        <p>Wild mushroom blend, fontina, thyme, black truffle oil, shaved parmesan off the wheel.</p>
+      </div>
+    </div>
+
+    <div class="menu-item" data-cat="signature">
+      <div class="menu-item-visual">
+        <img src="https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?auto=format&fit=crop&w=800&q=80" alt="Diavola pizza" loading="lazy">
+      </div>
+      <div class="menu-item-body">
+        <div class="menu-item-top"><h3>Diavola</h3><span class="price">$20</span></div>
+        <p>Spicy soppressata, san marzano, mozzarella, calabrian chili honey, fresh oregano.</p>
+        <span class="tag">Spicy</span>
+      </div>
+    </div>
+
+    <div class="menu-item" data-cat="signature">
+      <div class="menu-item-visual">
+        <img src="https://images.unsplash.com/photo-1593504049359-74330189a345?auto=format&fit=crop&w=800&q=80" alt="Quattro Formaggi pizza" loading="lazy">
+      </div>
+      <div class="menu-item-body">
+        <div class="menu-item-top"><h3>Quattro Formaggi</h3><span class="price">$21</span></div>
+        <p>Mozzarella, gorgonzola, fontina, aged pecorino, cracked black pepper, hot honey on request.</p>
+      </div>
+    </div>
+
+    <div class="menu-item" data-cat="signature">
+      <div class="menu-item-visual">
+        <img src="https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?auto=format&fit=crop&w=800&q=80" alt="Prosciutto & Fig pizza" loading="lazy">
+      </div>
+      <div class="menu-item-body">
+        <div class="menu-item-top"><h3>Prosciutto & Fig</h3><span class="price">$23</span></div>
+        <p>18-month prosciutto di parma laid on fresh out of the oven, black mission fig, arugula, balsamic reduction.</p>
+        <span class="tag">Chef's Pick</span>
+      </div>
+    </div>
+
+    <div class="menu-item hidden" data-cat="classic">
+      <div class="menu-item-visual">
+        <img src="https://images.unsplash.com/photo-1548365328-9f547fb0953b?auto=format&fit=crop&w=800&q=80" alt="Margherita Tradizionale pizza" loading="lazy">
+      </div>
+      <div class="menu-item-body">
+        <div class="menu-item-top"><h3>Margherita Tradizionale</h3><span class="price">$16</span></div>
+        <p>The purist's pie — tomato, mozzarella, basil, olive oil. Nothing added, nothing missing.</p>
+      </div>
+    </div>
+
+    <div class="menu-item hidden" data-cat="classic">
+      <div class="menu-item-visual">
+        <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=80" alt="Pepperoni Classic pizza" loading="lazy">
+      </div>
+      <div class="menu-item-body">
+        <div class="menu-item-top"><h3>Pepperoni Classic</h3><span class="price">$19</span></div>
+        <p>Cup-and-char pepperoni, mozzarella, san marzano tomato, a slick of chili oil off the crust.</p>
+        <span class="tag">Crowd Favorite</span>
+      </div>
+    </div>
+
+    <div class="menu-item hidden" data-cat="classic">
+      <div class="menu-item-visual">
+        <img src="https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?auto=format&fit=crop&w=800&q=80" alt="Marinara Napoletana pizza" loading="lazy">
+      </div>
+      <div class="menu-item-body">
+        <div class="menu-item-top"><h3>Marinara Napoletana</h3><span class="price">$14</span></div>
+        <p>No cheese, all flavor — san marzano tomato, garlic, oregano, extra virgin olive oil.</p>
+      </div>
+    </div>
+
+    <div class="menu-item hidden" data-cat="classic">
+      <div class="menu-item-visual">
+        <img src="https://images.unsplash.com/photo-1548369937-47519962c11a?auto=format&fit=crop&w=800&q=80" alt="Capricciosa pizza" loading="lazy">
+      </div>
+      <div class="menu-item-body">
+        <div class="menu-item-top"><h3>Capricciosa</h3><span class="price">$20</span></div>
+        <p>Ham, mushroom, artichoke, black olive, mozzarella — the old-school Roman classic.</p>
+      </div>
+    </div>
+
+    <div class="menu-item hidden" data-cat="seasonal">
+      <div class="menu-item-visual">
+        <img src="https://images.unsplash.com/photo-1600628421066-f6bda6a7b976?auto=format&fit=crop&w=800&q=80" alt="Autumn Squash & Sage pizza" loading="lazy">
+      </div>
+      <div class="menu-item-body">
+        <div class="menu-item-top"><h3>Autumn Squash & Sage</h3><span class="price">$21</span></div>
+        <p>Roasted butternut squash, crispy fried sage, mozzarella, brown butter, toasted pumpkin seed.</p>
+        <span class="tag">Fall Only</span>
+      </div>
+    </div>
+
+    <div class="menu-item hidden" data-cat="seasonal">
+      <div class="menu-item-visual">
+        <img src="https://images.unsplash.com/photo-1541745537411-b8046dc6d66c?auto=format&fit=crop&w=800&q=80" alt="Summer Peach & Burrata pizza" loading="lazy">
+      </div>
+      <div class="menu-item-body">
+        <div class="menu-item-top"><h3>Summer Peach & Burrata</h3><span class="price">$22</span></div>
+        <p>Grilled stone fruit, torn burrata, prosciutto, basil, a drizzle of hot honey.</p>
+        <span class="tag">Summer Only</span>
+      </div>
+    </div>
+
+    <div class="menu-item hidden" data-cat="seasonal">
+      <div class="menu-item-visual">
+        <img src="https://images.unsplash.com/photo-1517093602195-b3ba7b6a1a3f?auto=format&fit=crop&w=800&q=80" alt="Winter Truffle & Chestnut pizza" loading="lazy">
+      </div>
+      <div class="menu-item-body">
+        <div class="menu-item-top"><h3>Winter Truffle & Chestnut</h3><span class="price">$26</span></div>
+        <p>Roasted chestnut puree, taleggio, wild mushroom, black truffle shavings, rosemary.</p>
+        <span class="tag">Winter Only</span>
+      </div>
+    </div>
+
+    <div class="menu-item hidden" data-cat="seasonal">
+      <div class="menu-item-visual">
+        <img src="https://images.unsplash.com/photo-1595854341625-f33ee10dbf94?auto=format&fit=crop&w=800&q=80" alt="Spring Pea & Pancetta pizza" loading="lazy">
+      </div>
+      <div class="menu-item-body">
+        <div class="menu-item-top"><h3>Spring Pea & Pancetta</h3><span class="price">$21</span></div>
+        <p>Crushed sweet pea, crispy pancetta, mint, ricotta, lemon zest — bright and green.</p>
+        <span class="tag">Spring Only</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="quote-band">
+  <div class="quote-mark reveal">"</div>
+  <div class="quote-band-copy reveal">
+    <blockquote>A pizza should carry the smell of the wood it was fired over. Anything less, and it's just bread with toppings.</blockquote>
+    <div class="quote-attr">
+      <div class="line-sm"></div>
+      <div><b>Marco De Luca</b><span>Head Pizzaiolo, Ash Pizza King</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="ingredients" id="ingredients">
+  <div class="section-head reveal">
+    <div class="eyebrow">What Goes In</div>
+    <h2>Ingredients we won't negotiate on.</h2>
+    <p>The oven is only half the story. The other half is walked in through the back door every morning.</p>
+  </div>
+  <div class="ing-grid reveal">
+    <div class="ing-card">
+      <svg class="ico" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#e8722c" stroke-width="1.4"/><path d="M12 3v18M3 12h18" stroke="#e8722c" stroke-width="1" opacity="0.4"/></svg>
+      <h4>00 Flour</h4>
+      <p>Milled fine for a light, digestible crust with real char.</p>
+    </div>
+    <div class="ing-card">
+      <svg class="ico" viewBox="0 0 24 24" fill="none"><path d="M12 3c3 3 6 6.5 6 10a6 6 0 01-12 0c0-3.5 3-7 6-10z" stroke="#e8722c" stroke-width="1.4"/></svg>
+      <h4>San Marzano</h4>
+      <p>DOP tomatoes from the volcanic soil of Mount Vesuvius.</p>
+    </div>
+    <div class="ing-card">
+      <svg class="ico" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#e8722c" stroke-width="1.4"/><circle cx="12" cy="12" r="3" stroke="#e8722c" stroke-width="1"/></svg>
+      <h4>Fior di Latte</h4>
+      <p>Fresh mozzarella, made daily, never frozen.</p>
+    </div>
+    <div class="ing-card">
+      <svg class="ico" viewBox="0 0 24 24" fill="none"><path d="M4 20c6-2 10-8 16-16" stroke="#e8722c" stroke-width="1.4" stroke-linecap="round"/><circle cx="6" cy="18" r="1.4" fill="#e8722c"/></svg>
+      <h4>Oak & Cherry</h4>
+      <p>Hand-split firewood, sourced from local orchards.</p>
+    </div>
+  </div>
+</section>
+
+<section id="visit">
+  <div class="section-head reveal">
+    <div class="eyebrow">Visit Us</div>
+    <h2>Pull up a stool by the fire.</h2>
+    <p>Walk-ins welcome. Reservations recommended on weekends — the wood-fired seats go first.</p>
+  </div>
+  <div class="visit reveal">
+    <div class="visit-card">
+      <h4>Hours</h4>
+      <div class="visit-row"><span>Mon — Thu</span><span>5:00 PM – 10:00 PM</span></div>
+      <div class="visit-row"><span>Fri — Sat</span><span>5:00 PM – 11:30 PM</span></div>
+      <div class="visit-row"><span>Sunday</span><span>4:00 PM – 9:00 PM</span></div>
+    </div>
+    <div class="visit-card">
+      <h4>Find Us</h4>
+      <div class="visit-address">
+        <p><b style="color:var(--parchment); font-weight:500;">Ash Pizza King</b><br>
+        118 Ember Lane, Brick District<br>
+        Karachi, Pakistan</p>
+        <p style="margin-top:1rem;">+92 21 555 0134<br>hello@braci.pizza</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>
+    <div class="logo"><span class="dot"></span>ASH PIZZA KING</div>
+    <p style="margin-top:1rem; color:var(--parchment-dim); font-size:0.85rem; max-width:28ch;">Wood-fired pizza, fired the same way since day one.</p>
+  </div>
+  <div class="foot-cols">
+    <div>
+      <h5>Explore</h5>
+      <ul>
+        <li><a href="#story">Our Fire</a></li>
+        <li><a href="#menu">Menu</a></li>
+        <li><a href="#visit">Visit</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Follow</h5>
+      <ul>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">Facebook</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>© 2026 Ash Pizza King. All rights reserved.</span>
+    <span>Fired with love in Karachi</span>
+  </div>
+</footer>
+
+<script>
+  // nav scroll state
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, {threshold:0.15});
+  reveals.forEach(el => io.observe(el));
+
+  // menu tab switching
+  function switchMenuTab(tab, el){
+    document.querySelectorAll('.menu-tabs span').forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('#menuGrid .menu-item').forEach(item => {
+      item.classList.toggle('hidden', item.dataset.cat !== tab);
+    });
+  }
+
+  // embers rising in hero
+  const emberField = document.getElementById('embers');
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function spawnEmber(){
+    if (prefersReduced) return;
+    const el = document.createElement('div');
+    const size = 2 + Math.random()*3;
+    const startX = 55 + Math.random()*42;
+    const duration = 5 + Math.random()*5;
+    const drift = (Math.random()-0.5)*80;
+    el.style.cssText = `
+      position:absolute; left:${startX}%; bottom:-10px; width:${size}px; height:${size}px;
+      border-radius:50%; background:radial-gradient(circle, #ffcf8a, #e8722c 60%, transparent 70%);
+      box-shadow:0 0 ${size*2}px ${size}px rgba(232,114,44,0.5);
+      opacity:0; pointer-events:none;
+    `;
+    emberField.appendChild(el);
+    el.animate([
+      { transform:'translate(0,0)', opacity:0 },
+      { opacity:1, offset:0.12 },
+      { transform:`translate(${drift}px,-${60+Math.random()*30}vh)`, opacity:0 }
+    ], { duration: duration*1000, easing:'cubic-bezier(.2,.6,.3,1)' });
+    setTimeout(()=>el.remove(), duration*1000 + 100);
+  }
+  setInterval(spawnEmber, 260);
+  for(let i=0;i<8;i++) setTimeout(spawnEmber, i*150);
+
+  // sparks around the oven ring
+  const sparkSvg = document.querySelector('.oven-sparks');
+  function spawnSpark(){
+    if (prefersReduced || !sparkSvg) return;
+    const ns = "http://www.w3.org/2000/svg";
+    const c = document.createElementNS(ns, 'circle');
+    const angle = Math.random()*Math.PI*2;
+    const r = 150 + Math.random()*30;
+    const cx = 240 + Math.cos(angle)*r;
+    const cy = 240 + Math.sin(angle)*r;
+    const rad = 1 + Math.random()*2;
+    c.setAttribute('cx', cx); c.setAttribute('cy', cy); c.setAttribute('r', rad);
+    c.setAttribute('fill', '#ffd39a');
+    c.style.opacity = 0;
+    sparkSvg.appendChild(c);
+    const rise = 40 + Math.random()*60;
+    c.animate([
+      { transform:'translate(0,0)', opacity:0 },
+      { opacity:0.9, offset:0.2 },
+      { transform:`translate(${(Math.random()-0.5)*40}px,-${rise}px)`, opacity:0 }
+    ], { duration: 2200 + Math.random()*1400, easing:'ease-out' });
+    setTimeout(()=>c.remove(), 3800);
+  }
+  setInterval(spawnSpark, 180);
+</script>
+</body>
+</html>
